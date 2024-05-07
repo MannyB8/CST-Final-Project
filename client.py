@@ -1,37 +1,28 @@
 import socket
 import threading
+from PyQt6.QtCore import pyqtSignal, QObject
 
-nickname = input("Please enter a name: ")
+class Client(QObject):
+    messageReceived = pyqtSignal(str)
 
+    def __init__(self):
+        super().__init__()
+        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client.connect(('127.0.0.1', 65443))
 
+        # Start a separate thread to run the receive method
+        self.receive_thread = threading.Thread(target=self.receive)
+        self.receive_thread.start()
 
+    def receive(self):
+        while True:
+            try:
+                message = self.client.recv(1024).decode('utf-8')
+                self.messageReceived.emit(message)
+            except:
+                print("An error has occurred.")
+                self.client.close()
+                break
 
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(('127.0.0.1',65443))
-
-def receive():
-    while True:
-        try:
-            message =  client.recv(1024).decode('ascii')
-            if message == "NICK":
-                client.send(nickname.encode('ascii'))
-            else:
-                print(message)
-        except:
-            print("An error has occured.")
-            client.close()
-            break
-
-def write():
-    while True:
-        message = f'{nickname}: {input("")}'
-        client.send(message.encode('ascii'))
-
-receive_thread = threading.Thread(target=receive)
-receive_thread.start()
-
-write_thread = threading.Thread(target=write)
-write_thread.start()
-
-if __name__ == "__main__":
-    print('temp')
+    def send_message(self, message):
+        self.client.send(message.encode('utf-8'))

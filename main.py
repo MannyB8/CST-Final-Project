@@ -1,7 +1,10 @@
 import sys
 import csv
+import socket
 from PyQt6.QtWidgets import QMainWindow, QApplication, QMessageBox
 from gui import Ui_MainWindow
+from client import Client
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -23,6 +26,10 @@ class MainWindow(QMainWindow):
         self.users_file = 'users.csv'
 
         self.ui.display_box.setReadOnly(True)
+
+        self.client = Client()
+        self.client.messageReceived.connect(self.displayMessage)
+
 
     def showSignup(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.sign_up)
@@ -54,7 +61,6 @@ class MainWindow(QMainWindow):
             self.showLogin()
         else:
             QMessageBox.warning(self, "Incomplete Signup", "Please fill in all fields to sign up.")
-            pass
 
     def login(self):
         email = self.ui.login_email.text()
@@ -71,7 +77,6 @@ class MainWindow(QMainWindow):
 
         self.ui.login_email.clear()
         self.ui.login_password.clear()
-        pass
 
     def displayText(self):
         text = self.ui.text_box.text()
@@ -83,13 +88,15 @@ class MainWindow(QMainWindow):
                     if row[0] == self.ui.login_email.text():
                         username = row[2]
 
-        formatted_text = f"{username}: {text}\n"
-        current_text = self.ui.display_box.toPlainText()
         
-        new_text = current_text + formatted_text
+        message = f'{username}: {text}'
+        self.client.send_message(message)
+
+    def displayMessage(self, message):
+        current_text = self.ui.display_box.toPlainText()
+        new_text = current_text + message + '\n'
         self.ui.display_box.setPlainText(new_text)
         self.ui.text_box.clear()
-
         scrollbar = self.ui.display_box.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
 
