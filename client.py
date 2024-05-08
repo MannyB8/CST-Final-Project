@@ -1,6 +1,7 @@
 import socket
 import threading
 from PyQt6.QtCore import pyqtSignal, QObject
+from PyQt6.QtWidgets import QMainWindow, QApplication, QMessageBox
 
 class Client(QObject):
     messageReceived = pyqtSignal(str)
@@ -20,7 +21,7 @@ class Client(QObject):
                 message = self.client.recv(1024).decode('utf-8')
                 self.messageReceived.emit(message)
             except:
-                print("An error has occurred.")
+                QMessageBox.warning(self, "Server Error", "The server has been closed or has crashed.")
                 self.client.close()
                 break
 

@@ -97,6 +97,10 @@ class Ui_MainWindow(object):
         self.label_6 = QtWidgets.QLabel(self.sign_up)
         self.label_6.setGeometry(QtCore.QRect(280, 280, 81, 16))
         self.label_6.setObjectName("label_6")
+        self.serverStartButton = QtWidgets.QPushButton(self.login)  # Add server start button
+        self.serverStartButton.setGeometry(QtCore.QRect(350, 370, 113, 32))  # Adjust position
+        self.serverStartButton.setObjectName("serverStartButton")  # Set object name
+        self.serverStartButton.setText("Start Server")  # Set button text
         self.signup_login_button = QtWidgets.QPushButton(self.sign_up)
         self.signup_login_button.setGeometry(QtCore.QRect(550, 450, 131, 32))
         self.signup_login_button.setObjectName("signup_login_button")

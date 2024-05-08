@@ -1,5 +1,7 @@
 import sys
 import csv
+import subprocess
+import psutil
 import socket
 from PyQt6.QtWidgets import QMainWindow, QApplication, QMessageBox
 from gui import Ui_MainWindow
@@ -20,17 +22,45 @@ class MainWindow(QMainWindow):
         self.ui.signup_signup_button.clicked.connect(self.signup)
         self.ui.signup_login_button.clicked.connect(self.showLogin)
         self.ui.login_login_button.clicked.connect(self.login)
-
+        self.ui.serverStartButton.clicked.connect(self.startServer)
         self.ui.text_box.returnPressed.connect(self.displayText)
 
         self.users_file = 'users.csv'
 
         self.ui.display_box.setReadOnly(True)
 
-        self.client = Client()
-        self.client.messageReceived.connect(self.displayMessage)
+        if self.is_server_running():
+            self.connect_to_server()
+        else:
+            self.server_process = None
 
-
+    def is_server_running(self):
+        # Iterate over all running processes
+        for proc in psutil.process_iter():
+            try:
+                # Check if the process name contains 'python' and 'server.py'
+                if 'python' in proc.name().lower() and 'server.py' in ' '.join(proc.cmdline()).lower():
+                    return True
+            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                pass
+        return False
+    
+    def startServer(self):
+        try:
+            subprocess.Popen(["python", "server.py"])
+            QMessageBox.information(self, "Server Started", "Server has started successfully.")
+            self.client = Client()
+            self.client.messageReceived.connect(self.displayMessage)
+        except Exception as e:
+            QMessageBox.warning(self, "Error", f"Failed to start server: {str(e)}")
+            
+    def connect_to_server(self):
+        try:
+            self.client = Client()
+            self.client.messageReceived.connect(self.displayMessage)
+        except Exception as e:
+            QMessageBox.warning(self, "Error", f"Failed to connect to server: {str(e)}")
+            
     def showSignup(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.sign_up)
 
@@ -72,6 +102,7 @@ class MainWindow(QMainWindow):
                 if row[0] == email and row[1] == password:
                     self.ui.stackedWidget.setCurrentWidget(self.ui.home)
                     return
+                
 
         QMessageBox.warning(self, "Invalid Login", "Invalid email or password. Please try again or sign up.")
 
@@ -79,7 +110,6 @@ class MainWindow(QMainWindow):
         self.ui.login_password.clear()
 
     def displayText(self):
-        text = self.ui.text_box.text()
         username = "User"
         if self.ui.stackedWidget.currentWidget() == self.ui.home:
             with open(self.users_file, 'r') as csvfile:
@@ -88,7 +118,7 @@ class MainWindow(QMainWindow):
                     if row[0] == self.ui.login_email.text():
                         username = row[2]
 
-        
+        text = self.ui.text_box.text()
         message = f'{username}: {text}'
         self.client.send_message(message)
 
