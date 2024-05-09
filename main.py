@@ -48,15 +48,15 @@ class MainWindow(QMainWindow):
             QMessageBox.information(self, "Server Started", "Server has started successfully.")
             self.client = Client()
             self.client.messageReceived.connect(self.displayMessage)
-        except Exception as e:
-            QMessageBox.warning(self, "Error", f"Failed to start server: {str(e)}")
+        except Exception as error:
+            QMessageBox.warning(self, "Error", f"Failed to start server: {str(error)}")
             
     def connect_to_server(self):
         try:
             self.client = Client()
             self.client.messageReceived.connect(self.displayMessage)
-        except Exception as e:
-            QMessageBox.warning(self, "Error", f"Failed to connect to server: {str(e)}")
+        except Exception as error:
+            QMessageBox.warning(self, "Error", f"Failed to connect to server: {str(error)}")
             
     def showSignup(self):
         self.ui.stackedWidget.setCurrentWidget(self.ui.sign_up)
