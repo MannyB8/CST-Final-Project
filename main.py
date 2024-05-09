@@ -2,7 +2,6 @@ import sys
 import csv
 import subprocess
 import psutil
-import socket
 from PyQt6.QtWidgets import QMainWindow, QApplication, QMessageBox
 from gui import Ui_MainWindow
 from client import Client
@@ -35,10 +34,8 @@ class MainWindow(QMainWindow):
             self.server_process = None
 
     def is_server_running(self):
-        # Iterate over all running processes
         for proc in psutil.process_iter():
             try:
-                # Check if the process name contains 'python' and 'server.py'
                 if 'python' in proc.name().lower() and 'server.py' in ' '.join(proc.cmdline()).lower():
                     return True
             except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):

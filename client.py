@@ -11,7 +11,7 @@ class Client(QObject):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client.connect(('127.0.0.1', 65443))
 
-        # Start a separate thread to run the receive method
+       
         self.receive_thread = threading.Thread(target=self.receive)
         self.receive_thread.start()
 
