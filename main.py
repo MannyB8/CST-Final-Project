@@ -2,7 +2,8 @@ import sys
 import csv
 import subprocess
 import psutil
-from PyQt6.QtWidgets import QMainWindow, QApplication, QMessageBox
+import re
+from PyQt6.QtWidgets import QMainWindow, QApplication, QMessageBox, QLineEdit
 from gui import Ui_MainWindow
 from client import Client
 
@@ -17,12 +18,17 @@ class MainWindow(QMainWindow):
 
         self.ui.stackedWidget.setCurrentWidget(self.ui.login)
 
+        self.ui.login_password.setEchoMode(QLineEdit.EchoMode.Password)
+        self.ui.signup_password.setEchoMode(QLineEdit.EchoMode.Password)
+        
         self.ui.login_signup_button.clicked.connect(self.showSignup)
         self.ui.signup_signup_button.clicked.connect(self.signup)
         self.ui.signup_login_button.clicked.connect(self.showLogin)
         self.ui.login_login_button.clicked.connect(self.login)
         self.ui.serverStartButton.clicked.connect(self.startServer)
+
         self.ui.text_box.returnPressed.connect(self.displayText)
+        self.pattern = r'^.*@.*\.com$'
 
         self.users_file = 'users.csv'
 
@@ -69,6 +75,13 @@ class MainWindow(QMainWindow):
         password = self.ui.signup_password.text()
         username = self.ui.username.text()
 
+        if  re.match(self.pattern, email):
+            pass
+        else:
+            QMessageBox.warning(self, "Invalid Email Format",
+                                        "Please enter a valid Email.")
+            return
+
         with open(self.users_file, 'r') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
@@ -103,7 +116,6 @@ class MainWindow(QMainWindow):
 
         QMessageBox.warning(self, "Invalid Login", "Invalid email or password. Please try again or sign up.")
 
-        self.ui.login_email.clear()
         self.ui.login_password.clear()
 
     def displayText(self):
