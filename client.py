@@ -2,7 +2,7 @@ import socket
 import threading
 from PyQt6.QtCore import pyqtSignal, QObject
 from PyQt6.QtWidgets import QMainWindow, QApplication, QMessageBox
-
+# DONE DON"T TOUCH
 class Client(QObject):
     messageReceived = pyqtSignal(str)
 

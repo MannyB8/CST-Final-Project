@@ -7,7 +7,7 @@ from PyQt6.QtWidgets import QMainWindow, QApplication, QMessageBox, QLineEdit
 from gui import Ui_MainWindow
 from client import Client
 
-
+# DONE DON"T TOUCH
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
